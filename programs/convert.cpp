@@ -1,4 +1,4 @@
-int main ( ) {
+int main() {
     float f;
     int i;
     char c;
