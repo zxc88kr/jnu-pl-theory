@@ -72,7 +72,7 @@ public class StaticTypeCheck {
             else if (b.op.RelationalOp())
                 check(type1 == type2 , "type error for " + b.op);
             else if (b.op.BooleanOp())
-                check(type1 == Type.BOOL && type2 == Type.BOOL, b.op + ": non-bool operand");
+                check(type1 == Type.BOOL && type2 == Type.BOOL, "type error for " + b.op);
             else throw new IllegalArgumentException("should never reach here");
             return;
         }
