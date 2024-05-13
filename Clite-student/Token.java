@@ -1,5 +1,4 @@
 public class Token {
-
     private static final int KEYWORDS = TokenType.Eof.ordinal();
 
     private static final String[] reserved = new String[KEYWORDS];
@@ -42,7 +41,7 @@ public class Token {
     private TokenType type;
     private String value = "";
 
-    private Token (TokenType t, String v) {
+    private Token(TokenType t, String v) {
         type = t;
         value = v;
         if (t.compareTo(TokenType.Eof) < 0) {
@@ -52,41 +51,41 @@ public class Token {
         }
     }
 
-    public TokenType type( ) { return type; }
+    public TokenType type() { return type; }
 
-    public String value( ) { return value; }
+    public String value() { return value; }
 
-    public static Token keyword  ( String name ) {
+    public static Token keyword(String name) {
         char ch = name.charAt(0);
         if (ch >= 'A' && ch <= 'Z') return mkIdentTok(name);
         for (int i = 0; i < KEYWORDS; i++)
-           if (name.equals(reserved[i]))  return token[i];
+           if (name.equals(reserved[i])) return token[i];
         return mkIdentTok(name);
-    } // keyword
+    }
 
-    public static Token mkIdentTok (String name) {
+    public static Token mkIdentTok(String name) {
         return new Token(TokenType.Identifier, name);
     }
 
-    public static Token mkIntLiteral (String name) {
+    public static Token mkIntLiteral(String name) {
         return new Token(TokenType.IntLiteral, name);
     }
 
-    public static Token mkFloatLiteral (String name) {
+    public static Token mkFloatLiteral(String name) {
         return new Token(TokenType.FloatLiteral, name);
     }
 
-    public static Token mkCharLiteral (String name) {
+    public static Token mkCharLiteral(String name) {
         return new Token(TokenType.CharLiteral, name);
     }
 
-    public String toString ( ) {
+    public String toString() {
         if (type.compareTo(TokenType.Identifier) < 0) return value;
         return type + "\t" + value;
-    } // toString
+    }
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         System.out.println(eofTok);
         System.out.println(whileTok);
     }
-} // Token
+}

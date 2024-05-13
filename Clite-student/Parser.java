@@ -1,11 +1,6 @@
 import java.util.*;
 
 public class Parser {
-    // Recursive descent parser that inputs a C++Lite program and
-    // generates its abstract syntax.  Each method corresponds to
-    // a concrete syntax grammar rule, which appears as a comment
-    // at the beginning of the method.
-
     Token token; // current token from the input stream
     Lexer lexer;
 
@@ -18,8 +13,7 @@ public class Parser {
         String value = token.value();
         if (token.type().equals(t))
             token = lexer.next();
-        else
-            error(t);
+        else error(t);
         return value;
     }
 

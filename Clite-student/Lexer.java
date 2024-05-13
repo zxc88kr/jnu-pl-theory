@@ -1,7 +1,6 @@
 import java.io.*;
 
 public class Lexer {
-
     private boolean isEof = false;
     private char ch = ' ';
     private BufferedReader input;
@@ -182,7 +181,7 @@ public class Lexer {
         return r;
     }
 
-    public void error (String msg) {
+    public void error(String msg) {
         System.err.print(line);
         System.err.println("Error: column " + col + " " + msg);
         System.exit(1);

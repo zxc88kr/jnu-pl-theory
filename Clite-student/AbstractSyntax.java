@@ -76,7 +76,6 @@ class Skip extends Statement {
 
 class Block extends Statement {
     // Block = Statement*
-    // (a Vector of members)
     public ArrayList<Statement> members = new ArrayList<Statement>();
 
     public void display(int k) {
