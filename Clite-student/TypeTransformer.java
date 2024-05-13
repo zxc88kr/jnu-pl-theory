@@ -78,14 +78,14 @@ public class TypeTransformer {
     public static void main(String args[]) {
         Parser parser = new Parser(new Lexer(args[0]));
         Program prog = parser.program();
-        // prog.display(); // student exercise student exercise student exercise
+        prog.display(0);
         System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
         TypeMap map = StaticTypeCheck.typing(prog.decpart);
-        // map.display(); // student exercise student exercise student exercise
+        map.display();
         StaticTypeCheck.V(prog);
         Program out = T(prog, map);
         System.out.println("Output AST");
-        // out.display(); // student exercise student exercise student exercise
+        out.display(0);
     }
 }
