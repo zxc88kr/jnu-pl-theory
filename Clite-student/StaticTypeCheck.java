@@ -62,17 +62,17 @@ public class StaticTypeCheck {
         }
         if (e instanceof Binary) {
             Binary b = (Binary)e;
-            Type typ1 = typeOf(b.term1, tm);
-            Type typ2 = typeOf(b.term2, tm);
+            Type type1 = typeOf(b.term1, tm);
+            Type type2 = typeOf(b.term2, tm);
             V(b.term1, tm);
             V(b.term2, tm);
             if (b.op.ArithmeticOp())
-                check(typ1 == typ2 &&
-                        (typ1 == Type.INT || typ1 == Type.FLOAT), "type error for " + b.op);
+                check(type1 == type2 &&
+                        (type1 == Type.INT || type1 == Type.FLOAT), "type error for " + b.op);
             else if (b.op.RelationalOp())
-                check(typ1 == typ2 , "type error for " + b.op);
+                check(type1 == type2 , "type error for " + b.op);
             else if (b.op.BooleanOp())
-                check(typ1 == Type.BOOL && typ2 == Type.BOOL, b.op + ": non-bool operand");
+                check(type1 == Type.BOOL && type2 == Type.BOOL, b.op + ": non-bool operand");
             else throw new IllegalArgumentException("should never reach here");
             return;
         }

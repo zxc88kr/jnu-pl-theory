@@ -11,17 +11,17 @@ public class TypeTransformer {
         if (e instanceof Variable) return e;
         if (e instanceof Binary) {
             Binary b = (Binary)e;
-            Type typ1 = StaticTypeCheck.typeOf(b.term1, tm);
-            Type typ2 = StaticTypeCheck.typeOf(b.term2, tm);
+            Type type1 = StaticTypeCheck.typeOf(b.term1, tm);
+            Type type2 = StaticTypeCheck.typeOf(b.term2, tm);
             Expression t1 = T(b.term1, tm);
             Expression t2 = T(b.term2, tm);
-            if (typ1 == Type.INT)
+            if (type1 == Type.INT)
                 return new Binary(b.op.intMap(b.op.val), t1, t2);
-            else if (typ1 == Type.FLOAT)
+            else if (type1 == Type.FLOAT)
                 return new Binary(b.op.floatMap(b.op.val), t1, t2);
-            else if (typ1 == Type.CHAR)
+            else if (type1 == Type.CHAR)
                 return new Binary(b.op.charMap(b.op.val), t1, t2);
-            else if (typ1 == Type.BOOL)
+            else if (type1 == Type.BOOL)
                 return new Binary(b.op.boolMap(b.op.val), t1, t2);
             throw new IllegalArgumentException("should never reach here");
         }
