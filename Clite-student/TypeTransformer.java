@@ -17,15 +17,30 @@ public class TypeTransformer {
             Expression t2 = T(b.term2, tm);
             if (type1 == Type.INT)
                 return new Binary(b.op.intMap(b.op.val), t1, t2);
-            else if (type1 == Type.FLOAT)
+            if (type1 == Type.FLOAT)
                 return new Binary(b.op.floatMap(b.op.val), t1, t2);
-            else if (type1 == Type.CHAR)
+            if (type1 == Type.CHAR)
                 return new Binary(b.op.charMap(b.op.val), t1, t2);
-            else if (type1 == Type.BOOL)
+            if (type1 == Type.BOOL)
                 return new Binary(b.op.boolMap(b.op.val), t1, t2);
             throw new IllegalArgumentException("should never reach here");
         }
-        // student exercise student exercise student exercise
+        if (e instanceof Unary) {
+            Unary u = (Unary)e;
+            Type type = StaticTypeCheck.typeOf(u.term, tm);
+            Expression t0 = T(u.term, tm);
+            if (u.op.NotOp()) {
+                if (type == Type.BOOL)
+                    return new Unary(u.op.boolMap(u.op.val), t0);
+            }
+            if (u.op.NegateOp()) {
+                if (type == Type.INT)
+                    return new Unary(u.op.intMap(u.op.val), t0);
+                if (type == Type.FLOAT)
+                    return new Unary(u.op.floatMap(u.op.val), t0);
+            }
+            throw new IllegalArgumentException("should never reach here");
+        }
         throw new IllegalArgumentException("should never reach here");
     }
 
@@ -68,7 +83,7 @@ public class TypeTransformer {
         if (s instanceof Block) {
             Block b = (Block)s;
             Block out = new Block();
-            for (Statement stmt : b.members)
+            for (Statement stmt: b.members)
                 out.members.add(T(stmt, tm));
             return out;
         }

@@ -117,7 +117,7 @@ class Conditional extends Statement {
     }
 
     public void display(int k) {
-        for (int w = 0; w < k; w++); {
+        for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
         test.display(++k);

@@ -3,7 +3,7 @@ import java.util.*;
 public class StaticTypeCheck {
     public static TypeMap typing(Declarations d) {
         TypeMap map = new TypeMap();
-        for (Declaration di : d) map.put(di.v, di.t);
+        for (Declaration di: d) map.put(di.v, di.t);
         return map;
     }
 
@@ -45,10 +45,10 @@ public class StaticTypeCheck {
         if (e instanceof Unary) {
             Unary u = (Unary)e;
             if (u.op.NotOp()) return (Type.BOOL);
-            else if (u.op.NegateOp()) return typeOf(u.term,tm);
-            else if (u.op.intOp()) return (Type.INT);
-            else if (u.op.floatOp()) return (Type.FLOAT);
-            else if (u.op.charOp()) return (Type.CHAR);
+            if (u.op.NegateOp()) return typeOf(u.term,tm);
+            if (u.op.intOp()) return (Type.INT);
+            if (u.op.floatOp()) return (Type.FLOAT);
+            if (u.op.charOp()) return (Type.CHAR);
         }
         throw new IllegalArgumentException("should never reach here");
     } 
@@ -76,7 +76,17 @@ public class StaticTypeCheck {
             else throw new IllegalArgumentException("should never reach here");
             return;
         }
-        // student exercise student exercise student exercise
+        if (e instanceof Unary) {
+            Unary u = (Unary)e;
+            Type type = typeOf(u.term, tm);
+            V(u.term, tm);
+            if (u.op.NotOp())
+                check(type == Type.BOOL, "type error for " + u.op);
+            else if (u.op.NegateOp())
+                check(type == Type.INT || type == Type.FLOAT, "type error for " + u.op);
+            else throw new IllegalArgumentException("should never reach here");
+            return;
+        }
         throw new IllegalArgumentException("should never reach here");
     }
 
@@ -97,8 +107,33 @@ public class StaticTypeCheck {
                 else check(false, "mixed mode assignment to " + a.target);
             }
             return;
-        } 
-        // student exercise student exercise student exercise
+        }
+        if (s instanceof Conditional) {
+            Conditional c = (Conditional)s;
+            V(c.test, tm);
+            Type testtype = typeOf(c.test, tm);
+            if (testtype == Type.BOOL) {
+                V(c.thenbranch, tm);
+                V(c.elsebranch, tm);
+            }
+            else check ( false, "poorly typed test: " + c.test);
+            return;
+        }
+        if (s instanceof Loop) {
+            Loop l = (Loop)s;
+            V(l.test, tm);
+            Type testtype = typeOf(l.test, tm);
+            if (testtype == Type.BOOL)
+                V(l.body, tm);
+            else check ( false, "poorly typed test: " + l.test);
+            return;
+        }
+        if (s instanceof Block) {
+            Block b = (Block)s;
+            for(Statement stmt: b.members)
+                V(stmt, tm);
+            return;
+        }
         throw new IllegalArgumentException("should never reach here");
     }
 
