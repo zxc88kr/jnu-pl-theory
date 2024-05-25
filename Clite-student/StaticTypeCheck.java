@@ -84,6 +84,10 @@ public class StaticTypeCheck {
                 check(type == Type.BOOL, "type error for " + u.op);
             else if (u.op.NegateOp())
                 check(type == Type.INT || type == Type.FLOAT, "type error for " + u.op);
+            else if (u.op.floatOp() || u.op.charOp())
+                check(type == Type.INT, "type error for " + u.op);
+            else if (u.op.intOp())
+                check(type == Type.FLOAT || type == Type.CHAR, "type error for " + u.op);
             else throw new IllegalArgumentException("should never reach here");
             return;
         }
