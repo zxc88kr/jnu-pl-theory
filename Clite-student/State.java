@@ -9,7 +9,7 @@ public class State extends HashMap<Variable, Value> {
     
     public State onion(Variable key, Value val) {
         put(key, val);
-        System.out.print("{ ");
+        System.out.print("\t{ ");
         for (Variable k : this.keySet())
             System.out.print("<" + k + ", " + this.get(k) + "> ");
         System.out.println("}");
@@ -23,7 +23,7 @@ public class State extends HashMap<Variable, Value> {
     }
 
     public void display() {
-        System.out.print("{ ");
+        System.out.print("\t{ ");
         for (Variable key : this.keySet())
             System.out.print("<" + key + ", " + this.get(key) + "> ");
         System.out.println("}");
