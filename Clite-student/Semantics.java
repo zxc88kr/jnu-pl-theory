@@ -165,6 +165,7 @@ public class Semantics {
         System.out.println("Output AST");
         out.display(0);
         Semantics semantics = new Semantics();
+        System.out.println("Change State");
         State state = semantics.M(out);
         System.out.println("Final State");
         state.display();
