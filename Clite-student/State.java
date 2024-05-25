@@ -1,10 +1,7 @@
 import java.util.*;
 
-public class State extends HashMap<Variable, Value> { 
-    // Defines the set of variables and their associated values 
-    // that are active during interpretation
-    
-    public State( ) { }
+public class State extends HashMap<Variable, Value> {
+    public State() {}
     
     public State(Variable key, Value val) {
         put(key, val);
@@ -15,10 +12,9 @@ public class State extends HashMap<Variable, Value> {
         return this;
     }
     
-    public State onion (State t) {
-        for (Variable key : t.keySet( ))
+    public State onion(State t) {
+        for (Variable key : t.keySet())
             put(key, t.get(key));
         return this;
     }
-
 }
