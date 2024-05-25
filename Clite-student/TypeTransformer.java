@@ -15,12 +15,23 @@ public class TypeTransformer {
             Type type2 = StaticTypeCheck.typeOf(b.term2, tm);
             Expression t1 = T(b.term1, tm);
             Expression t2 = T(b.term2, tm);
-            if (type1 == Type.INT)
+            if (type1 == Type.INT) {
+                if (type2 == Type.FLOAT)
+                    t2 = new Unary(new Operator(Operator.F2I), t2);
+                if (type2 == Type.CHAR)
+                    t2 = new Unary(new Operator(Operator.C2I), t2);
                 return new Binary(b.op.intMap(b.op.val), t1, t2);
-            if (type1 == Type.FLOAT)
+            }
+            if (type1 == Type.FLOAT) {
+                if (type2 == Type.INT)
+                    t2 = new Unary(new Operator(Operator.I2F), t2);
                 return new Binary(b.op.floatMap(b.op.val), t1, t2);
-            if (type1 == Type.CHAR)
+            }
+            if (type1 == Type.CHAR) {
+                if (type2 == Type.INT)
+                    t2 = new Unary(new Operator(Operator.I2C), t2);
                 return new Binary(b.op.charMap(b.op.val), t1, t2);
+            }
             if (type1 == Type.BOOL)
                 return new Binary(b.op.boolMap(b.op.val), t1, t2);
             throw new IllegalArgumentException("should never reach here");
@@ -39,6 +50,26 @@ public class TypeTransformer {
                 if (type == Type.FLOAT)
                     return new Unary(u.op.floatMap(u.op.val), t0);
             }
+            if (u.op.intOp()) {
+                if (type == Type.INT)
+                    return new Unary(u.op.intMap(u.op.val), t0);
+                if (type == Type.FLOAT)
+                    return new Unary(u.op.floatMap(u.op.val), t0);
+                if (type == Type.CHAR)
+                    return new Unary(u.op.charMap(u.op.val), t0);
+            }
+            if (u.op.floatOp()) {
+                if (type == Type.INT)
+                    return new Unary(u.op.intMap(u.op.val), t0);
+                if (type == Type.FLOAT)
+                    return new Unary(u.op.floatMap(u.op.val), t0);
+            }
+            if (u.op.charOp()) {
+                if (type == Type.INT)
+                    return new Unary(u.op.intMap(u.op.val), t0);
+                if (type == Type.CHAR)
+                    return new Unary(u.op.charMap(u.op.val), t0);
+            }
             throw new IllegalArgumentException("should never reach here");
         }
         throw new IllegalArgumentException("should never reach here");
@@ -49,7 +80,7 @@ public class TypeTransformer {
         if (s instanceof Assignment) {
             Assignment a = (Assignment)s;
             Variable target = a.target;
-            Expression src = T (a.source, tm);
+            Expression src = T(a.source, tm);
             Type ttype = (Type)tm.get(a.target);
             Type srctype = StaticTypeCheck.typeOf(a.source, tm);
             if (ttype == Type.FLOAT) {

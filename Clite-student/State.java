@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class State extends HashMap<Variable, Value> {
-    public State() {}
+    public State() { }
     
     public State(Variable key, Value val) {
         put(key, val);

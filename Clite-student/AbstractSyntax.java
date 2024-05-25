@@ -57,7 +57,7 @@ class Type {
     final static Type BOOL = new Type("bool");
     final static Type CHAR = new Type("char");
     final static Type FLOAT = new Type("float");
-    // final static Type UNDEFINED = new Type("undef");
+    final static Type UNDEFINED = new Type("undef");
 
     private String id;
 
@@ -208,7 +208,6 @@ abstract class Value extends Expression {
         if (type == Type.FLOAT) return new FloatValue();
         throw new IllegalArgumentException("Illegal type in mkValue");
     }
-    // 추가 예정
 }
 
 class IntValue extends Value {
@@ -232,7 +231,7 @@ class IntValue extends Value {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        System.out.print("Int: ");
+        System.out.print("IntValue: ");
         System.out.println(value);
     }
 }
