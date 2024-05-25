@@ -17,4 +17,8 @@ public class State extends HashMap<Variable, Value> {
             put(key, t.get(key));
         return this;
     }
+
+    public void display() {
+        System.out.println(this.entrySet());
+    }
 }
