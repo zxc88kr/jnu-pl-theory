@@ -419,6 +419,9 @@ class Operator {
     final static String CHAR_NE = "CHAR!=";
     final static String CHAR_GT = "CHAR>";
     final static String CHAR_GE = "CHAR>=";
+    // RelationalOp = && | ||
+    final static String BOOL_AND = "BOOL&&";
+    final static String BOOL_OR = "BOOL||";
     // RelationalOp = < | <= | == | != | >= | >
     final static String BOOL_LT = "BOOL<";
     final static String BOOL_LE = "BOOL<=";
@@ -479,6 +482,7 @@ class Operator {
     final static String boolMap[][] = {
         {EQ, BOOL_EQ}, {NE, BOOL_NE}, {LT, BOOL_LT},
         {LE, BOOL_LE}, {GT, BOOL_GT}, {GE, BOOL_GE},
+        {AND, BOOL_AND}, {OR, BOOL_OR}
     };
 
     final static private Operator map(String[][] tmap, String op) {
