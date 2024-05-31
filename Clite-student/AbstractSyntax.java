@@ -20,7 +20,6 @@ class Program {
 
 class Declarations extends ArrayList<Declaration> {
     // Declarations = Declaration*
-    // (a list of declarations d1, d2, ..., dn)
     public void display(int k) {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
@@ -90,12 +89,14 @@ class Function {
 }
 
 class Type {
-    // Type = int | bool | char | float
+    // Type = int | bool | char | float | void | undef | unused
     final static Type INT = new Type("int");
     final static Type BOOL = new Type("bool");
     final static Type CHAR = new Type("char");
     final static Type FLOAT = new Type("float");
+    final static Type VOID = new Type("void");
     final static Type UNDEFINED = new Type("undef");
+    final static Type UNUSED = new Type("unused");
 
     private String id;
 
@@ -105,7 +106,7 @@ class Type {
 }
 
 class Prototype extends Type {
-    Declarations params; // 반환형은 Type에 의해 상속받음
+    Declarations params;
 
     Prototype(String t) { super(t); }
     
@@ -114,7 +115,7 @@ class Prototype extends Type {
  
 
 abstract class Statement {
-    // Statement = Skip | Block | Assignment | Conditional | Loop
+    // Statement = Skip | Block | Assignment | Conditional | Loop | Call | Return
     public void display(int k) { }
 }
 
@@ -298,6 +299,8 @@ abstract class Value extends Expression {
 
     boolean isUndef() { return undef; }
 
+    boolean isUnused() { return false; }
+
     Type type() { return type; }
 
     static Value mkValue(Type type) {
@@ -305,6 +308,8 @@ abstract class Value extends Expression {
         if (type == Type.BOOL) return new BoolValue();
         if (type == Type.CHAR) return new CharValue();
         if (type == Type.FLOAT) return new FloatValue();
+        if (type == Type.UNDEFINED) return new UndefinedValue();
+        if (type == Type.UNUSED) return new UnusedValue();
         throw new IllegalArgumentException("Illegal type in mkValue");
     }
 }
@@ -415,6 +420,28 @@ class FloatValue extends Value {
         }
         System.out.print("FloatValue: ");
         System.out.println(value);
+    }
+}
+
+class UndefinedValue extends Value {
+    UndefinedValue() { type = Type.UNDEFINED; undef = true; }
+    
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("UndefinedValue");
+    }
+}
+
+class UnusedValue extends Value {
+    UnusedValue() { type = Type.UNUSED; undef = true; }
+    
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("UnusedValue");
     }
 }
 
