@@ -273,7 +273,7 @@ class Variable extends Expression {
 }
 
 abstract class Value extends Expression {
-    // Value = IntValue | BoolValue | CharValue | FloatValue
+    // Value = IntValue | BoolValue | CharValue | FloatValue | VoidValue | UndefinedValue | UnusedValue
     protected Type type;
     protected boolean undef = true;
 
@@ -419,6 +419,32 @@ class FloatValue extends Value {
             System.out.print("\t");
         }
         System.out.print("FloatValue: ");
+        System.out.println(value);
+    }
+}
+
+class VoidValue extends Value {
+	private float value = 0;
+	
+	VoidValue() { type = Type.VOID; }
+	
+	VoidValue(float v) { this(); value = v; undef = false; }
+	
+	float voidValue() {
+		assert !undef : "reference to undefined void value";
+		return value;
+	}
+	
+	public String toString() {
+		if (undef) return "undef";
+        return "" + value;
+	}
+	
+	public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.print("VoidValue: ");
         System.out.println(value);
     }
 }
