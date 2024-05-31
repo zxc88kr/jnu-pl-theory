@@ -99,10 +99,19 @@ class Type {
 
     private String id;
 
-    private Type(String t) { id = t; }
+    Type(String t) { id = t; }
 
     public String toString() { return id; }
 }
+
+class Prototype extends Type {
+    Declarations params; // 반환형은 Type에 의해 상속받음
+
+    Prototype(String t) { super(t); }
+    
+    public void display(int k) { }
+ }
+ 
 
 abstract class Statement {
     // Statement = Skip | Block | Assignment | Conditional | Loop
@@ -179,6 +188,58 @@ class Loop extends Statement {
         }
         test.display(++k);
         body.display(k);
+    }
+}
+
+class Call extends Statement {
+    // Call = String name; Expressions args
+    String name;
+    Expressions args;
+
+    Call(String n, Expressions a) {
+        name = n; args = a;
+    }
+
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Call: " + name);
+        args.display(++k);
+    }
+}
+
+class Return extends Statement {
+    // Return = Variable target; Expression result
+    Variable target;
+    Expression result;
+
+    Return(Variable t, Expression r) {
+        target = t; result = r;
+    }
+    
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        target.display(++k);
+        result.display(k);
+    }
+}
+
+class Expressions extends ArrayList<Expression> {
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Expressions: ");
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.print("\t{");
+        for (int i = 0; i < size(); i++)
+            get(i).display(k);
+        System.out.println("}");
     }
 }
 
