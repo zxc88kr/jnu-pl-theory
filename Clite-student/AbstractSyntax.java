@@ -1,20 +1,20 @@
 import java.util.*;
 
 class Program {
-    // Program = Declarations decpart; Block body
-    Declarations decpart;
-    Block body;
+    // Program = Declarations globals; Functions functions
+    Declarations globals;
+    Functions functions;
 
-    Program(Declarations d, Block b) {
-        decpart = d; body = b;
+    Program(Declarations g, Functions f) {
+        globals = g; functions = f;
     }
 
     public void display(int k) {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        decpart.display(++k);
-        body.display(k);
+        globals.display(++k);
+        functions.display(k);
     }
 }
 
@@ -37,18 +37,56 @@ class Declarations extends ArrayList<Declaration> {
 }
 
 class Declaration {
-    // Declaration = Variable v; Type t
-    Variable v;
-    Type t;
+    // Declaration = Variable var; Type type
+    Variable var;
+    Type type;
 
-    Declaration(Variable var, Type type) {
-        v = var; t = type;
+    Declaration(Variable v, Type t) {
+        var = v; type = t;
     }
 
     public void display(int k) {
-        System.out.print(" <" + v + ", ");
-        System.out.print(t + "> ");
+        System.out.print(" <" + var + ", ");
+        System.out.print(type + "> ");
     }
+}
+
+class Functions extends ArrayList<Function> {
+    // Functions = Function*
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Functions: ");
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.print("\t{");
+        for (int i = 0; i < size(); i++)
+            get(i).display(k);
+        System.out.println("}");
+    }
+}
+
+class Function {
+    // Function = Type type; String id; Declarations params, locals; Block body
+    Type type;
+    String id;
+    Declarations params, locals;
+    Block body;
+
+    Function(Type t, String s, Declarations p, Declarations l, Block b) {
+        type = t; id = s; params = p; locals = l; body = b;
+	}
+	
+	public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Declarations: ");
+        params.display(++k);
+        locals.display(k);
+	}
 }
 
 class Type {
