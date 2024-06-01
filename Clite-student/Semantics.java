@@ -3,10 +3,10 @@ public class Semantics {
         return M(p.body, initialState(p.decpart));
     }
 
-    State initialState(Declarations d) {
+    State initialState(Declarations ds) {
         State state = new State();
         Value intUndef = new IntValue();
-        for (Declaration decl : d)
+        for (Declaration decl : ds)
             state.put(decl.var, Value.mkValue(decl.type));
         return state;
     }

@@ -1,20 +1,20 @@
 import java.util.*;
 
 public class StaticTypeCheck {
-    public static TypeMap typing(Declarations d) {
+    public static TypeMap typing(Declarations ds) {
         TypeMap map = new TypeMap();
-        for (Declaration di : d) {
+        for (Declaration di : ds) {
             map.put(di.var, di.type);
         }
         return map;
     }
 
-    public static TypeMap typing(Declarations d, Functions f) {
+    public static TypeMap typing(Declarations ds, Functions fs) {
         TypeMap map = new TypeMap();
-        for (Declaration di : d) {
+        for (Declaration di : ds) {
             map.put(di.var, di.type);
         }
-        for (Function fi : f) {
+        for (Function fi : fs) {
             map.put(new Variable(fi.id), new Prototype(fi.type, fi.params));
         }
         return map;
@@ -26,13 +26,20 @@ public class StaticTypeCheck {
         System.exit(1);
     }
 
-    public static void V(Declarations d) {
-        for (int i = 0; i < d.size() - 1; i++)
-            for (int j = i + 1; j < d.size(); j++) {
-                Declaration di = d.get(i);
-                Declaration dj = d.get(j);
-                check(!(di.var.equals(dj.var)), "duplicate declaration: " + dj.var);
+    public static void V(Declarations ds, Functions fs) {
+        Declaration di, dj;
+        Function fj;
+        for (int i = 0; i < ds.size(); i++) {
+            di = ds.get(i);
+            for (int j = i + 1; j < ds.size(); j++) {
+                dj = ds.get(j);
+                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
             }
+            for (int j = 0; j < fs.size(); j++) {
+                fj = fs.get(j);
+                check(!di.var.toString().equals(fj.id), "duplicate declaration: " + fj.id);
+            }
+        }
     }
 
     public static void V(Program p) {

@@ -249,7 +249,7 @@ public class Parser {
         Expressions args;
 		match(TokenType.LeftParen);
 		args = new Expressions();
-		while (!(isRightParen())) {
+		while (!isRightParen()) {
 			args.add(expression());
 			if (isComma()) match(TokenType.Comma);
 		}
