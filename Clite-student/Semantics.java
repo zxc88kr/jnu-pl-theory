@@ -2,11 +2,11 @@ import java.util.Iterator;
 
 public class Semantics {
     StateFrame M(Program p) {
-        StateFrame stateFrame = new StateFrame();
-		stateFrame.pushState(initialState(p.globals));
-        stateFrame = M(new Call("main", new Expressions()), stateFrame, p.functions);
-        stateFrame.popState();
-		return stateFrame;
+        StateFrame state = new StateFrame();
+		state.pushState(initialState(p.globals));
+        state = M(new Call("main", new Expressions()), state, p.functions);
+        state.popState();
+		return state;
     }
 
     State initialState(Declarations ds) {
@@ -17,50 +17,50 @@ public class Semantics {
         return state;
     }
 
-    StateFrame M(Call call, StateFrame stateFrame, Functions functions) {
-		Function function = functions.getFunction(call.name);
-		State newState = new State();
-		for (Declaration decl : function.locals)
-            newState.put(decl.var, Value.mkValue(decl.type));
+    StateFrame M(Call c, StateFrame state, Functions fs) {
+		Function f = fs.getFunction(c.name);
+		State st = new State();
+		for (Declaration decl : f.locals)
+            st.put(decl.var, Value.mkValue(decl.type));
 
-		Iterator<Expression> argIt = call.args.iterator();
-		Iterator<Declaration> funcIt = function.params.iterator();
+		Iterator<Expression> argIt = c.args.iterator();
+		Iterator<Declaration> paramIt = f.params.iterator();
 		while (argIt.hasNext()) {
-			Expression expression = argIt.next();
-			Declaration declaration = funcIt.next();
-			Value value = M(expression, stateFrame);
-			newState.put(declaration.var, value);
+			Expression exp = argIt.next();
+			Declaration decl = paramIt.next();
+			Value value = M(exp, state);
+			st.put(decl.var, value);
 		}
-		stateFrame.pushState(newState);
+		state.pushState(st);
 		
-		if (!call.name.equals(Token.mainTok.value())) {
-			stateFrame.put(new Variable(call.name), Value.mkValue(functions.getFunction(call.name).type));
+		if (!c.name.equals(Token.mainTok.value())) {
+			state.put(new Variable(c.name), Value.mkValue(fs.getFunction(c.name).type));
 		}
-		System.out.print("Call: " + call.name);
-		stateFrame.display();
+		System.out.print("Call: " + c.name);
+		state.display();
 		
-		Iterator<Statement> members = function.body.members.iterator();
-		while (members.hasNext()) {
-			Statement statement = members.next();
-			if (stateFrame.get(new Variable(call.name)) != null && !stateFrame.get(new Variable(call.name)).isUndef()) {
-				System.out.print("Return: " + call.name);
-				stateFrame.display();
-				return stateFrame;
+		Iterator<Statement> memIt = f.body.members.iterator();
+		while (memIt.hasNext()) {
+			Statement stmt = memIt.next();
+			if (state.get(new Variable(c.name)) != null && !state.get(new Variable(c.name)).isUndef()) {
+				System.out.print("Return: " + c.name);
+				state.display();
+				return state;
 			}
-			if (statement instanceof Return) {
-				Return r = (Return)statement;
-				Value returnValue = M(r.result, stateFrame);
-				stateFrame.put(r.target, returnValue);
-				System.out.print("Return: " + call.name);
-				stateFrame.display();
-				return stateFrame;
+			if (stmt instanceof Return) {
+				Return r = (Return)stmt;
+				Value returnValue = M(r.result, state);
+				state.put(r.target, returnValue);
+				System.out.print("Return: " + c.name);
+				state.display();
+				return state;
 			} else {
-                stateFrame = M(statement, stateFrame);
+                state = M(stmt, state);
             }
 		}
-		System.out.print("Return: " + call.name);
-		stateFrame.display();
-		return stateFrame;
+		System.out.print("Return: " + c.name);
+		state.display();
+		return state;
 	}
 
     StateFrame M(Statement s, StateFrame state) {
