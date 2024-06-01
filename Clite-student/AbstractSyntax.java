@@ -105,11 +105,11 @@ class Type {
     public String toString() { return id; }
 }
 
-class Prototype extends Type {
+class ProtoType extends Type {
     Declarations params;
 
-    Prototype(Type t) { super(t.toString()); }
-    Prototype(Type t, Declarations p) { super(t.toString()); params = p; }
+    ProtoType(Type t) { super(t.toString()); }
+    ProtoType(Type t, Declarations p) { super(t.toString()); params = p; }
     
     public void display(int k) { }
  }

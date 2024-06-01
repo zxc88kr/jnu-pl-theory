@@ -15,9 +15,9 @@ public class TypeMap extends HashMap<Variable, Type> {
         for (Variable key : keySet()) {
             System.out.print(sep + "<" + key + ", " );
             Type t = this.get(key);
-            if (t instanceof Prototype) {
-                System.out.print(((Prototype)t).id + ", ");
-                ((Prototype)t).params.display(1);
+            if (t instanceof ProtoType) {
+                System.out.print(((ProtoType)t).id + ", ");
+                ((ProtoType)t).params.display(1);
                 System.out.print(">");
             } else {
                 System.out.print(get(key).id + ">"); 

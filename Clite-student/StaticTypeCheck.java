@@ -15,7 +15,7 @@ public class StaticTypeCheck {
             map.put(di.var, di.type);
         }
         for (Function fi : fs) {
-            map.put(new Variable(fi.id), new Prototype(fi.type, fi.params));
+            map.put(new Variable(fi.id), new ProtoType(fi.type, fi.params));
         }
         return map;
     }
@@ -163,6 +163,8 @@ public class StaticTypeCheck {
         if (e instanceof CallExpression) {
             CallExpression c = (CallExpression)e;
             check(tm.containsKey(c.name), "undefined call: " + c.name);
+            ProtoType p = (ProtoType)tm.get(c.name);
+            checkProtoType(p, tm, typeOf(e, tm), c.args);
             return;
         }
         throw new IllegalArgumentException("should never reach here");
