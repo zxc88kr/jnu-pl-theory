@@ -26,6 +26,29 @@ public class StaticTypeCheck {
         System.exit(1);
     }
 
+    public static void V(Declarations ds) {
+        Declaration di, dj;
+        for (int i = 0; i < ds.size() - 1; i++) {
+            for (int j = i + 1; j < ds.size(); j++) {
+                di = ds.get(i);
+                dj = ds.get(j);
+                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
+            }
+        }
+    }
+
+    public static void V(Declarations d1, Declarations d2) {
+        V(d1); V(d2);
+        Declaration di, dj;
+        for (int i = 0; i < d1.size(); i++) {
+            for (int j = 0; j < d2.size(); j++) {
+                di = d1.get(i);
+                dj = d2.get(j);
+                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
+            }
+        }
+    }
+
     public static void V(Declarations ds, Functions fs) {
         Declaration di, dj;
         Function fj;
@@ -43,8 +66,23 @@ public class StaticTypeCheck {
     }
 
     public static void V(Program p) {
-        V(p.decpart);
-        V(p.body, typing(p.decpart));
+        V(p.globals, p.functions);
+        boolean foundmain = false;
+        TypeMap tmg = typing(p.globals, p.functions);
+        System.out.print("Globals = ");
+        p.globals.display(1);
+        for (Function f : p.functions) {
+            if (f.id.equals("main")) {
+                if (foundmain) check(false, "duplicate main function");
+                else foundmain = true;
+            }
+            V(f.params, f.locals);
+            TypeMap tmf = typing(f.params).onion(typing(f.locals));
+            tmf = tmg.onion(tmf);
+            System.out.print("\nFunction " + f.id + " = ");
+            tmf.display();
+            V(f.body, tmf);
+        }
     }
 
     public static Type typeOf(Expression e, TypeMap tm) {
