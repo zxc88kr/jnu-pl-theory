@@ -201,11 +201,11 @@ class Loop extends Statement {
 }
 
 class Call extends Statement {
-    // Call = Variable name; Expressions args
-    Variable name;
+    // Call = String name; Expressions args
+    String name;
     Expressions args;
 
-    Call(Variable n, Expressions a) {
+    Call(String n, Expressions a) {
         name = n; args = a;
     }
 
@@ -520,10 +520,10 @@ class Unary extends Expression {
 
 class CallExpression extends Expression {
     // Call = String name; Expressions args
-    Variable name;
+    String name;
     Expressions args;
 
-    CallExpression(Variable n, Expressions a) {
+    CallExpression(String n, Expressions a) {
         name = n; args = a;
     }
 

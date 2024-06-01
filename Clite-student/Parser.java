@@ -164,7 +164,7 @@ public class Parser {
 			if (isAssign()) {
 				s = assignment(id);
 			} else if (isLeftParen()) {
-				s = callStatement(id);
+				s = callStatement(id.toString());
 			} else {
 				error("statement token");
 			}
@@ -243,7 +243,7 @@ public class Parser {
         return new Loop(exp, s);
     }
 
-	private Call callStatement(Variable id) {
+	private Call callStatement(String id) {
 		// CallStatement -> Call;
 		// Call -> Identifier ( Arguments )
         Expressions args;
