@@ -255,7 +255,7 @@ public class Parser {
 		}
 		match(TokenType.RightParen);
         match(TokenType.Semicolon);
-		return new Call(id.toString(), args);
+		return new Call(id, args);
 	}
 	
 	private Return returnStatement() {

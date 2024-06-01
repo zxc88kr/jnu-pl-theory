@@ -85,6 +85,12 @@ public class StaticTypeCheck {
         }
     }
 
+    public static Type typeOf(Function f, TypeMap tm) {
+        Variable v = new Variable(f.id);
+        check(tm.containsKey(v), "undefined variable: " + v);
+        return tm.get(v);
+    }
+
     public static Type typeOf(Expression e, TypeMap tm) {
         if (e instanceof Value) return ((Value)e).type;
         if (e instanceof Variable) {
@@ -108,6 +114,11 @@ public class StaticTypeCheck {
             if (u.op.floatOp()) return (Type.FLOAT);
             if (u.op.charOp()) return (Type.CHAR);
         }
+        if (e instanceof CallExpression) {
+            CallExpression c = (CallExpression)e;
+            check(tm.containsKey(c.name), "undefined call: " + c.name);
+            return tm.get(c.name);
+        }
         throw new IllegalArgumentException("should never reach here");
     } 
 
@@ -115,7 +126,7 @@ public class StaticTypeCheck {
         if (e instanceof Value) return;
         if (e instanceof Variable) { 
             Variable v = (Variable)e;
-            check(tm.containsKey(v), "undeclared variable: " + v);
+            check(tm.containsKey(v), "undefined variable: " + v);
             return;
         }
         if (e instanceof Binary) {
@@ -147,6 +158,11 @@ public class StaticTypeCheck {
             else if (u.op.intOp())
                 check(type == Type.FLOAT || type == Type.CHAR, "type error for " + u.op);
             else throw new IllegalArgumentException("should never reach here");
+            return;
+        }
+        if (e instanceof CallExpression) {
+            CallExpression c = (CallExpression)e;
+            check(tm.containsKey(c.name), "undefined call: " + c.name);
             return;
         }
         throw new IllegalArgumentException("should never reach here");
@@ -194,6 +210,17 @@ public class StaticTypeCheck {
             Block b = (Block)s;
             for(Statement stmt: b.members)
                 V(stmt, tm);
+            return;
+        }
+        if (s instanceof Call) {
+            Call c = (Call)s;
+            check(tm.containsKey(f.name), "undefined call: " + c.name);
+            return;
+        }
+        if (s instanceof Return) {
+            Return r = (Return)s;
+            V(r.target, tm);
+            V(r.result, tm);
             return;
         }
         throw new IllegalArgumentException("should never reach here");

@@ -195,10 +195,10 @@ class Loop extends Statement {
 
 class Call extends Statement {
     // Call = String name; Expressions args
-    String name;
+    Variable name;
     Expressions args;
 
-    Call(String n, Expressions a) {
+    Call(Variable n, Expressions a) {
         name = n; args = a;
     }
 
@@ -246,7 +246,7 @@ class Expressions extends ArrayList<Expression> {
 }
 
 abstract class Expression {
-    // Expression = Variable | Value | Binary | Unary
+    // Expression = Variable | Value | Binary | Unary | Call
     public void display(int k) { }
 }
 
@@ -259,7 +259,7 @@ class Variable extends Expression {
     public String toString() { return id; }
 
     public boolean equals(Object obj) {
-        String s = ((Variable) obj).id;
+        String s = ((Variable)obj).id;
         return id.equals(s); // case-sensitive identifiers
     }
 
@@ -508,6 +508,24 @@ class Unary extends Expression {
         System.out.print("Unary: ");
         op.display(++k);
         term.display(k);
+    }
+}
+
+class CallExpression extends Expression {
+    // Call = String name; Expressions args
+    Variable name;
+    Expressions args;
+
+    CallExpression(Variable n, Expressions a) {
+        name = n; args = a;
+    }
+
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Call: " + name);
+        args.display(++k);
     }
 }
 
