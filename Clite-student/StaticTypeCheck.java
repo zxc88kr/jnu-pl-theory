@@ -26,6 +26,16 @@ public class StaticTypeCheck {
         System.exit(1);
     }
 
+    public static void checkProtoType(ProtoType p, TypeMap tm, Type t, Expressions es) {
+        check(p.equals(t), "calls can only be to void functions");
+        check(es.size() == p.params.size(), "match numbers of arguments and params");
+        for (int i = 0; i < es.size(); i++) {
+           Expression e1 = (Expression)es.get(i);
+           Expression e2 = (Expression)((Declaration)p.params.get(i)).var;
+           check(typeOf(e1, tm).equals(typeOf(e2, typing(p.params))), "argument type does not match parameter");
+        }
+    }
+
     public static void V(Declarations ds) {
         Declaration di, dj;
         for (int i = 0; i < ds.size() - 1; i++) {
@@ -196,7 +206,7 @@ public class StaticTypeCheck {
                 V(c.thenbranch, tm);
                 V(c.elsebranch, tm);
             }
-            else check ( false, "poorly typed test: " + c.test);
+            else check(false, "poorly typed test: " + c.test);
             return;
         }
         if (s instanceof Loop) {
@@ -205,7 +215,7 @@ public class StaticTypeCheck {
             Type testtype = typeOf(l.test, tm);
             if (testtype == Type.BOOL)
                 V(l.body, tm);
-            else check ( false, "poorly typed test: " + l.test);
+            else check(false, "poorly typed test: " + l.test);
             return;
         }
         if (s instanceof Block) {
@@ -216,13 +226,16 @@ public class StaticTypeCheck {
         }
         if (s instanceof Call) {
             Call c = (Call)s;
-            check(tm.containsKey(f.name), "undefined call: " + c.name);
+            check(tm.containsKey(c.name), "undefined call: " + c.name); 
+            ProtoType p = (ProtoType)tm.get(c.name);
+            checkProtoType(p, tm, Type.VOID, c.args);
             return;
         }
         if (s instanceof Return) {
             Return r = (Return)s;
-            V(r.target, tm);
+            check(tm.containsKey(r.target), "undefined return: " + r.target);
             V(r.result, tm);
+            check(((Type)tm.get(r.target)).equals(typeOf(r.result, tm)), "incorrect return type");
             return;
         }
         throw new IllegalArgumentException("should never reach here");
