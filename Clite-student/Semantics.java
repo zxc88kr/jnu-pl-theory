@@ -1,6 +1,12 @@
+import java.util.ArrayList;
+
 public class Semantics {
-    State M(Program p) {
-        return M(p.body, initialState(p.decpart));
+    StateFrame M(Program p) {
+        StateFrame stateFrame = new StateFrame();
+		stateFrame.pushState(initialState(p.globals));
+        stateFrame = M(new Call("main", new ArrayList<>()), stateFrame, p.functions);
+        stateFrame.popState();
+		return stateFrame;
     }
 
     State initialState(Declarations ds) {
@@ -10,6 +16,90 @@ public class Semantics {
             state.put(decl.var, Value.mkValue(decl.type));
         return state;
     }
+
+    StateFrame M(Call call, StateFrame stateFrame, Functions functions) {
+		// Call 하는 함수 가져옴.
+		Function function = functions.getFunction(call.name);
+		
+		// 새로운 State
+		State newState = new State();
+		
+		// 로컬 변수 추가.
+		for (Declaration declaration : function.locals)
+		{
+			newState.put(declaration.v, Value.mkValue(declaration.t));
+		}
+		
+		// 매개변수와 파라미터의 이터레이터.
+		// 각각을 매핑
+		Iterator<Expression> argIt = call.args.iterator();
+		Iterator<Declaration> funcIt = function.params.iterator();
+		while (argIt.hasNext())
+		{
+			Expression expression = argIt.next();
+			Declaration declaration = funcIt.next();
+			// 매개변수 값 계산.
+			Value value = M(expression, stateFrame, functions);
+			// 파라미터에 넣음.
+			newState.put(declaration.v, value);
+		}
+		
+		// 추가
+		stateFrame.pushState(newState);
+		
+		// 현재 함수도 State 에 넣음
+		// main 의 경우는 넣지 않는다.
+		if (!call.name.equals(Token.mainTok.value()))
+		{
+			stateFrame.put(new Variable(call.name), Value.mkValue(functions.getFunction(call.name).t));
+		}
+		
+		// Call Display
+		Display.print(0, "Calling " + call.name);
+		stateFrame.display();
+		
+		// 함수 body 의 모든 Statement 계산.
+		Iterator<Statement> members = function.body.members.iterator();
+		while (members.hasNext())
+		{
+			Statement statement = members.next();
+			
+			// 다른 Statement 에서 리턴했으면 함수 이름이 있음
+			if(stateFrame.get(new Variable(call.name)) != null && !stateFrame.get(new Variable(call.name)).isUndef())
+			{
+				Display.print(0, "Returning " + call.name);
+				stateFrame.display();
+				
+				return stateFrame;
+			}
+			
+			// 리턴이면 함수 종료.
+			if (statement instanceof Return)
+			{
+				Return r = (Return) statement;
+				// 리턴할 값 계산.
+				Value returnValue = M(r.result, stateFrame, functions);
+				// 삽입
+				stateFrame.put(r.target, returnValue);
+				
+				Display.print(0, "Returning " + call.name);
+				stateFrame.display();
+				
+				return stateFrame;
+			}
+			// 아니면 Statement 계산
+			else
+			{
+				stateFrame = M(statement, stateFrame, functions);
+			}
+		}
+		
+		// Display
+		Display.print(0, "Returning " + call.name);
+		stateFrame.display();
+		
+		return stateFrame;
+	}
 
     State M(Statement s, State state) {
         if (s instanceof Skip) return M((Skip)s, state);

@@ -52,6 +52,13 @@ class Declaration {
 
 class Functions extends ArrayList<Function> {
     // Functions = Function*
+    public Function getFunction(String name) {
+        for (Function function : this)
+            if (function.id.equals(name))
+                return function;
+		return null;
+	}
+    
     public void display(int k) {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
@@ -194,7 +201,7 @@ class Loop extends Statement {
 }
 
 class Call extends Statement {
-    // Call = String name; Expressions args
+    // Call = Variable name; Expressions args
     Variable name;
     Expressions args;
 
