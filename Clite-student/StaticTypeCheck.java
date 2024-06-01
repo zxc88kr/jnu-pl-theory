@@ -3,7 +3,20 @@ import java.util.*;
 public class StaticTypeCheck {
     public static TypeMap typing(Declarations d) {
         TypeMap map = new TypeMap();
-        for (Declaration di: d) map.put(di.v, di.t);
+        for (Declaration di : d) {
+            map.put(di.var, di.type);
+        }
+        return map;
+    }
+
+    public static TypeMap typing(Declarations d, Functions f) {
+        TypeMap map = new TypeMap();
+        for (Declaration di : d) {
+            map.put(di.var, di.type);
+        }
+        for (Function fi : f) {
+            map.put(new Variable(fi.id), new Prototype(fi.type, fi.params));
+        }
         return map;
     }
 
@@ -18,7 +31,7 @@ public class StaticTypeCheck {
             for (int j = i + 1; j < d.size(); j++) {
                 Declaration di = d.get(i);
                 Declaration dj = d.get(j);
-                check(!(di.v.equals(dj.v)), "duplicate declaration: " + dj.v);
+                check(!(di.var.equals(dj.var)), "duplicate declaration: " + dj.var);
             }
     }
 

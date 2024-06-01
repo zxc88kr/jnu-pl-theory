@@ -98,7 +98,7 @@ class Type {
     final static Type UNDEFINED = new Type("undef");
     final static Type UNUSED = new Type("unused");
 
-    private String id;
+    protected String id;
 
     Type(String t) { id = t; }
 
@@ -108,7 +108,8 @@ class Type {
 class Prototype extends Type {
     Declarations params;
 
-    Prototype(String t) { super(t); }
+    Prototype(Type t) { super(t.toString()); }
+    Prototype(Type t, Declarations p) { super(t.toString()); params = p; }
     
     public void display(int k) { }
  }

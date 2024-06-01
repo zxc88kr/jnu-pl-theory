@@ -16,11 +16,11 @@ public class TypeMap extends HashMap<Variable, Type> {
             System.out.print(sep + "<" + key + ", " );
             Type t = this.get(key);
             if (t instanceof Prototype) {
-                System.out.print(((Prototype)t).toString() + ", ");
+                System.out.print(((Prototype)t).id + ", ");
                 ((Prototype)t).params.display(1);
                 System.out.print(">");
             } else {
-                System.out.print(get(key).toString() + ">"); 
+                System.out.print(get(key).id + ">"); 
             }
             sep = ", \n";
         }
