@@ -247,7 +247,7 @@ public class StaticTypeCheck {
         prog.display(0);
         System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = typing(prog.decpart);
+        TypeMap map = typing(prog.globals);
         map.display();
         V(prog);
     }
