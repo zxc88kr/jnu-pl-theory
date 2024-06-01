@@ -1,5 +1,3 @@
-import java.util.*;
-
 public class Parser {
     Token token;
     Variable currentFunction;

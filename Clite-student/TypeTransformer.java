@@ -1,5 +1,3 @@
-import java.util.*;
-
 public class TypeTransformer {
     public static Program T(Program p, TypeMap tm) {
         Functions functions = T(p.functions, tm);

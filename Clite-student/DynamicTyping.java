@@ -1,8 +1,3 @@
-// Following is the semantics class
-// for a dynamically typed language.
-// The meaning M of a Statement is a State.
-// The meaning M of a Expression is a Value.
-
 public class DynamicTyping extends Semantics {
     
     State M (Program p) { 

@@ -1,5 +1,3 @@
-import java.util.*;
-
 public class StaticTypeCheck {
     public static TypeMap typing(Declarations ds) {
         TypeMap map = new TypeMap();
