@@ -1,20 +1,9 @@
-public class StaticTypeCheck {
-    public static TypeMap typing(Declarations ds) {
-        TypeMap map = new TypeMap();
-        for (Declaration di : ds) {
-            map.put(di.var, di.type);
-        }
-        return map;
-    }
+import java.util.*;
 
-    public static TypeMap typing(Declarations ds, Functions fs) {
+public class StaticTypeCheck {
+    public static TypeMap typing(Declarations d) {
         TypeMap map = new TypeMap();
-        for (Declaration di : ds) {
-            map.put(di.var, di.type);
-        }
-        for (Function fi : fs) {
-            map.put(new Variable(fi.id), new ProtoType(fi.type, fi.params));
-        }
+        for (Declaration di: d) map.put(di.v, di.t);
         return map;
     }
 
@@ -24,79 +13,18 @@ public class StaticTypeCheck {
         System.exit(1);
     }
 
-    public static void checkProtoType(ProtoType p, TypeMap tm, Type t, Expressions es) {
-        check(p.equals(t), "calls can only be to void functions");
-        check(es.size() == p.params.size(), "match numbers of arguments and params");
-        for (int i = 0; i < es.size(); i++) {
-           Expression e1 = (Expression)es.get(i);
-           Expression e2 = (Expression)((Declaration)p.params.get(i)).var;
-           check(typeOf(e1, tm).equals(typeOf(e2, typing(p.params))), "argument type does not match parameter");
-        }
-    }
-
-    public static void V(Declarations ds) {
-        Declaration di, dj;
-        for (int i = 0; i < ds.size() - 1; i++) {
-            for (int j = i + 1; j < ds.size(); j++) {
-                di = ds.get(i);
-                dj = ds.get(j);
-                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
+    public static void V(Declarations d) {
+        for (int i = 0; i < d.size() - 1; i++)
+            for (int j = i + 1; j < d.size(); j++) {
+                Declaration di = d.get(i);
+                Declaration dj = d.get(j);
+                check(!(di.v.equals(dj.v)), "duplicate declaration: " + dj.v);
             }
-        }
-    }
-
-    public static void V(Declarations d1, Declarations d2) {
-        V(d1); V(d2);
-        Declaration di, dj;
-        for (int i = 0; i < d1.size(); i++) {
-            for (int j = 0; j < d2.size(); j++) {
-                di = d1.get(i);
-                dj = d2.get(j);
-                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
-            }
-        }
-    }
-
-    public static void V(Declarations ds, Functions fs) {
-        Declaration di, dj;
-        Function fj;
-        for (int i = 0; i < ds.size(); i++) {
-            di = ds.get(i);
-            for (int j = i + 1; j < ds.size(); j++) {
-                dj = ds.get(j);
-                check(!di.var.equals(dj.var), "duplicate declaration: " + dj.var);
-            }
-            for (int j = 0; j < fs.size(); j++) {
-                fj = fs.get(j);
-                check(!di.var.toString().equals(fj.id), "duplicate declaration: " + fj.id);
-            }
-        }
     }
 
     public static void V(Program p) {
-        V(p.globals, p.functions);
-        boolean foundmain = false;
-        TypeMap tmg = typing(p.globals, p.functions);
-        System.out.print("Globals = ");
-        p.globals.display(1);
-        for (Function f : p.functions) {
-            if (f.id.equals("main")) {
-                if (foundmain) check(false, "duplicate main function");
-                else foundmain = true;
-            }
-            V(f.params, f.locals);
-            TypeMap tmf = typing(f.params).onion(typing(f.locals));
-            tmf = tmg.onion(tmf);
-            System.out.print("\nFunction " + f.id + " = ");
-            tmf.display();
-            V(f.body, tmf);
-        }
-    }
-
-    public static Type typeOf(Function f, TypeMap tm) {
-        Variable v = new Variable(f.id);
-        check(tm.containsKey(v), "undefined variable: " + v);
-        return tm.get(v);
+        V(p.decpart);
+        V(p.body, typing(p.decpart));
     }
 
     public static Type typeOf(Expression e, TypeMap tm) {
@@ -122,11 +50,6 @@ public class StaticTypeCheck {
             if (u.op.floatOp()) return (Type.FLOAT);
             if (u.op.charOp()) return (Type.CHAR);
         }
-        if (e instanceof CallExpression) {
-            CallExpression c = (CallExpression)e;
-            check(tm.containsKey(c.name), "undefined call: " + c.name);
-            return tm.get(c.name);
-        }
         throw new IllegalArgumentException("should never reach here");
     } 
 
@@ -134,7 +57,7 @@ public class StaticTypeCheck {
         if (e instanceof Value) return;
         if (e instanceof Variable) { 
             Variable v = (Variable)e;
-            check(tm.containsKey(v), "undefined variable: " + v);
+            check(tm.containsKey(v), "undeclared variable: " + v);
             return;
         }
         if (e instanceof Binary) {
@@ -168,13 +91,6 @@ public class StaticTypeCheck {
             else throw new IllegalArgumentException("should never reach here");
             return;
         }
-        if (e instanceof CallExpression) {
-            CallExpression c = (CallExpression)e;
-            check(tm.containsKey(c.name), "undefined call: " + c.name);
-            ProtoType p = (ProtoType)tm.get(c.name);
-            checkProtoType(p, tm, typeOf(e, tm), c.args);
-            return;
-        }
         throw new IllegalArgumentException("should never reach here");
     }
 
@@ -204,7 +120,7 @@ public class StaticTypeCheck {
                 V(c.thenbranch, tm);
                 V(c.elsebranch, tm);
             }
-            else check(false, "poorly typed test: " + c.test);
+            else check ( false, "poorly typed test: " + c.test);
             return;
         }
         if (s instanceof Loop) {
@@ -213,27 +129,13 @@ public class StaticTypeCheck {
             Type testtype = typeOf(l.test, tm);
             if (testtype == Type.BOOL)
                 V(l.body, tm);
-            else check(false, "poorly typed test: " + l.test);
+            else check ( false, "poorly typed test: " + l.test);
             return;
         }
         if (s instanceof Block) {
             Block b = (Block)s;
             for(Statement stmt: b.members)
                 V(stmt, tm);
-            return;
-        }
-        if (s instanceof Call) {
-            Call c = (Call)s;
-            check(tm.containsKey(c.name), "undefined call: " + c.name); 
-            ProtoType p = (ProtoType)tm.get(c.name);
-            checkProtoType(p, tm, Type.VOID, c.args);
-            return;
-        }
-        if (s instanceof Return) {
-            Return r = (Return)s;
-            check(tm.containsKey(r.target), "undefined return: " + r.target);
-            V(r.result, tm);
-            check(((Type)tm.get(r.target)).equals(typeOf(r.result, tm)), "incorrect return type");
             return;
         }
         throw new IllegalArgumentException("should never reach here");
@@ -245,7 +147,7 @@ public class StaticTypeCheck {
         prog.display(0);
         System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = typing(prog.globals);
+        TypeMap map = typing(prog.decpart);
         map.display();
         V(prog);
     }

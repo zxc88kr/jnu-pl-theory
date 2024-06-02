@@ -1,25 +1,26 @@
 import java.util.*;
 
 class Program {
-    // Program = Declarations globals; Functions functions
-    Declarations globals;
-    Functions functions;
+    // Program = Declarations decpart; Block body
+    Declarations decpart;
+    Block body;
 
-    Program(Declarations g, Functions f) {
-        globals = g; functions = f;
+    Program(Declarations d, Block b) {
+        decpart = d; body = b;
     }
 
     public void display(int k) {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        globals.display(++k);
-        functions.display(k);
+        decpart.display(++k);
+        body.display(k);
     }
 }
 
 class Declarations extends ArrayList<Declaration> {
     // Declarations = Declaration*
+    // (a list of declarations d1, d2, ..., dn)
     public void display(int k) {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
@@ -36,94 +37,37 @@ class Declarations extends ArrayList<Declaration> {
 }
 
 class Declaration {
-    // Declaration = Variable var; Type type
-    Variable var;
-    Type type;
+    // Declaration = Variable v; Type t
+    Variable v;
+    Type t;
 
-    Declaration(Variable v, Type t) {
-        var = v; type = t;
+    Declaration(Variable var, Type type) {
+        v = var; t = type;
     }
 
     public void display(int k) {
-        System.out.print(" <" + var + ", ");
-        System.out.print(type + "> ");
+        System.out.print(" <" + v + ", ");
+        System.out.print(t + "> ");
     }
-}
-
-class Functions extends ArrayList<Function> {
-    // Functions = Function*
-    public Function getFunction(String name) {
-        for (Function function : this)
-            if (function.id.equals(name))
-                return function;
-		return null;
-	}
-    
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Functions: ");
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("\t{");
-        for (int i = 0; i < size(); i++)
-            get(i).display(k);
-        System.out.println("}");
-    }
-}
-
-class Function {
-    // Function = Type type; String id; Declarations params, locals; Block body
-    Type type;
-    String id;
-    Declarations params, locals;
-    Block body;
-
-    Function(Type t, String s, Declarations p, Declarations l, Block b) {
-        type = t; id = s; params = p; locals = l; body = b;
-	}
-	
-	public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Declarations: ");
-        params.display(++k);
-        locals.display(k);
-	}
 }
 
 class Type {
-    // Type = int | bool | char | float | void | undef | unused
+    // Type = int | bool | char | float
     final static Type INT = new Type("int");
     final static Type BOOL = new Type("bool");
     final static Type CHAR = new Type("char");
     final static Type FLOAT = new Type("float");
-    final static Type VOID = new Type("void");
     final static Type UNDEFINED = new Type("undef");
-    final static Type UNUSED = new Type("unused");
 
-    protected String id;
+    private String id;
 
-    Type(String t) { id = t; }
+    private Type(String t) { id = t; }
 
     public String toString() { return id; }
 }
 
-class ProtoType extends Type {
-    Declarations params;
-
-    ProtoType(Type t) { super(t.toString()); }
-    ProtoType(Type t, Declarations p) { super(t.toString()); params = p; }
-    
-    public void display(int k) { }
- }
- 
-
 abstract class Statement {
-    // Statement = Skip | Block | Assignment | Conditional | Loop | Call | Return
+    // Statement = Skip | Block | Assignment | Conditional | Loop
     public void display(int k) { }
 }
 
@@ -200,60 +144,8 @@ class Loop extends Statement {
     }
 }
 
-class Call extends Statement {
-    // Call = String name; Expressions args
-    String name;
-    Expressions args;
-
-    Call(String n, Expressions a) {
-        name = n; args = a;
-    }
-
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Call: " + name);
-        args.display(++k);
-    }
-}
-
-class Return extends Statement {
-    // Return = Variable target; Expression result
-    Variable target;
-    Expression result;
-
-    Return(Variable t, Expression r) {
-        target = t; result = r;
-    }
-    
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        target.display(++k);
-        result.display(k);
-    }
-}
-
-class Expressions extends ArrayList<Expression> {
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Expressions: ");
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("\t{");
-        for (int i = 0; i < size(); i++)
-            get(i).display(k);
-        System.out.println("}");
-    }
-}
-
 abstract class Expression {
-    // Expression = Variable | Value | Binary | Unary | Call
+    // Expression = Variable | Value | Binary | Unary
     public void display(int k) { }
 }
 
@@ -266,7 +158,7 @@ class Variable extends Expression {
     public String toString() { return id; }
 
     public boolean equals(Object obj) {
-        String s = ((Variable)obj).id;
+        String s = ((Variable) obj).id;
         return id.equals(s); // case-sensitive identifiers
     }
 
@@ -281,7 +173,7 @@ class Variable extends Expression {
 }
 
 abstract class Value extends Expression {
-    // Value = IntValue | BoolValue | CharValue | FloatValue | VoidValue | UndefinedValue | UnusedValue
+    // Value = IntValue | BoolValue | CharValue | FloatValue
     protected Type type;
     protected boolean undef = true;
 
@@ -307,8 +199,6 @@ abstract class Value extends Expression {
 
     boolean isUndef() { return undef; }
 
-    boolean isUnused() { return false; }
-
     Type type() { return type; }
 
     static Value mkValue(Type type) {
@@ -316,8 +206,6 @@ abstract class Value extends Expression {
         if (type == Type.BOOL) return new BoolValue();
         if (type == Type.CHAR) return new CharValue();
         if (type == Type.FLOAT) return new FloatValue();
-        if (type == Type.UNDEFINED) return new UndefinedValue();
-        if (type == Type.UNUSED) return new UnusedValue();
         throw new IllegalArgumentException("Illegal type in mkValue");
     }
 }
@@ -431,54 +319,6 @@ class FloatValue extends Value {
     }
 }
 
-class VoidValue extends Value {
-	private float value = 0;
-	
-	VoidValue() { type = Type.VOID; }
-	
-	VoidValue(float v) { this(); value = v; undef = false; }
-	
-	float voidValue() {
-		assert !undef : "reference to undefined void value";
-		return value;
-	}
-	
-	public String toString() {
-		if (undef) return "undef";
-        return "" + value;
-	}
-	
-	public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("VoidValue: ");
-        System.out.println(value);
-    }
-}
-
-class UndefinedValue extends Value {
-    UndefinedValue() { type = Type.UNDEFINED; undef = true; }
-    
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("UndefinedValue");
-    }
-}
-
-class UnusedValue extends Value {
-    UnusedValue() { type = Type.UNUSED; undef = true; }
-    
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("UnusedValue");
-    }
-}
-
 class Binary extends Expression {
     // Binary = Operator op; Expression term1, term2
     Operator op;
@@ -515,24 +355,6 @@ class Unary extends Expression {
         System.out.print("Unary: ");
         op.display(++k);
         term.display(k);
-    }
-}
-
-class CallExpression extends Expression {
-    // Call = String name; Expressions args
-    String name;
-    Expressions args;
-
-    CallExpression(String n, Expressions a) {
-        name = n; args = a;
-    }
-
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Call: " + name);
-        args.display(++k);
     }
 }
 
