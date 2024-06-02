@@ -1,9 +1,20 @@
-import java.util.*;
-
 public class TypeTransformer {
     public static Program T(Program p, TypeMap tm) {
-        Block body = (Block)T(p.body, tm);
-        return new Program(p.decpart, body);
+        Functions functions = T(p.functions, tm);
+        return new Program(p.globals, functions);
+    }
+
+    public static Functions T(Functions fs, TypeMap globals) {
+        Functions out = new Functions();
+        for (Function f : fs) {
+            TypeMap tm = new TypeMap();
+            tm.putAll(globals);
+            tm.putAll(StaticTypeCheck.typing(f.params));
+            tm.putAll(StaticTypeCheck.typing(f.locals));
+            Block b = (Block)T(f.body, tm);
+            out.add(new Function(f.type, f.id, f.params, f.locals, b));
+        }
+        return out;
     }
 
     public static Expression T(Expression e, TypeMap tm) {
@@ -95,7 +106,7 @@ public class TypeTransformer {
                     srctype = Type.INT;
                 }
             }
-            StaticTypeCheck.check( ttype == srctype, "bug in assignment to " + target);
+            StaticTypeCheck.check(ttype == srctype, "bug in assignment to " + target);
             return new Assignment(target, src);
         }
         if (s instanceof Conditional) {
@@ -127,7 +138,7 @@ public class TypeTransformer {
         prog.display(0);
         System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = StaticTypeCheck.typing(prog.decpart);
+        TypeMap map = StaticTypeCheck.typing(prog.globals);
         map.display();
         StaticTypeCheck.V(prog);
         Program out = T(prog, map);

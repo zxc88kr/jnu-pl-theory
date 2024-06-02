@@ -1,17 +1,69 @@
+import java.util.Iterator;
+
 public class Semantics {
-    State M(Program p) {
-        return M(p.body, initialState(p.decpart));
+    StateFrame M(Program p) {
+        StateFrame state = new StateFrame();
+		state.pushState(initialState(p.globals));
+        state = M(new Call("main", new Expressions()), state, p.functions);
+        state.popState();
+		return state;
     }
 
-    State initialState(Declarations d) {
+    State initialState(Declarations ds) {
         State state = new State();
         Value intUndef = new IntValue();
-        for (Declaration decl : d)
-            state.put(decl.v, Value.mkValue(decl.t));
+        for (Declaration decl : ds)
+            state.put(decl.var, Value.mkValue(decl.type));
         return state;
     }
 
-    State M(Statement s, State state) {
+    StateFrame M(Call c, StateFrame state, Functions fs) {
+		Function f = fs.getFunction(c.name);
+		State st = new State();
+		for (Declaration decl : f.locals)
+            st.put(decl.var, Value.mkValue(decl.type));
+
+		Iterator<Expression> argIt = c.args.iterator();
+		Iterator<Declaration> paramIt = f.params.iterator();
+		while (argIt.hasNext()) {
+			Expression exp = argIt.next();
+			Declaration decl = paramIt.next();
+			Value value = M(exp, state);
+			st.put(decl.var, value);
+		}
+		state.pushState(st);
+		
+		if (!c.name.equals(Token.mainTok.value())) {
+			state.put(new Variable(c.name), Value.mkValue(fs.getFunction(c.name).type));
+		}
+		System.out.print("Call: " + c.name);
+		state.display();
+		
+		Iterator<Statement> memIt = f.body.members.iterator();
+		while (memIt.hasNext()) {
+			Statement stmt = memIt.next();
+			if (state.get(new Variable(c.name)) != null && !state.get(new Variable(c.name)).isUndef()) {
+				System.out.print("Return: " + c.name);
+				state.display();
+				return state;
+			}
+			if (stmt instanceof Return) {
+				Return r = (Return)stmt;
+				Value returnValue = M(r.result, state);
+				state.put(r.target, returnValue);
+				System.out.print("Return: " + c.name);
+				state.display();
+				return state;
+			} else {
+                state = M(stmt, state);
+            }
+		}
+		System.out.print("Return: " + c.name);
+		state.display();
+		return state;
+	}
+
+    StateFrame M(Statement s, StateFrame state) {
         if (s instanceof Skip) return M((Skip)s, state);
         if (s instanceof Assignment) return M((Assignment)s, state);
         if (s instanceof Block) return M((Block)s, state);
@@ -20,27 +72,27 @@ public class Semantics {
         throw new IllegalArgumentException("should never reach here");
     }
 
-    State M(Skip s, State state) {
+    StateFrame M(Skip s, StateFrame state) {
         return state;
     }
 
-    State M(Assignment a, State state) {
+    StateFrame M(Assignment a, StateFrame state) {
         return state.onion(a.target, M(a.source, state));
     }
 
-    State M(Block b, State state) {
+    StateFrame M(Block b, StateFrame state) {
         for (Statement s : b.members)
             state = M(s, state);
         return state;
     }
 
-    State M(Loop l, State state) {
+    StateFrame M(Loop l, StateFrame state) {
         if (M(l.test, state).boolValue())
             return M(l, M(l.body, state));
         else return state;
     }
 
-    State M(Conditional c, State state) {
+    StateFrame M(Conditional c, StateFrame state) {
         if (M(c.test, state).boolValue())
             return M(c.thenbranch, state);
         else return M(c.elsebranch, state);
@@ -136,11 +188,11 @@ public class Semantics {
         throw new IllegalArgumentException("should never reach here");
     }
 
-    Value M(Expression e, State state) {
+    Value M(Expression e, StateFrame state) {
         if (e instanceof Value)
             return (Value)e;
         if (e instanceof Variable)
-            return (Value)(state.get(e));
+            return (Value)(state.get((Variable)e));
         if (e instanceof Binary) {
             Binary b = (Binary)e;
             return applyBinary(b.op, M(b.term1, state), M(b.term2, state));
@@ -158,7 +210,7 @@ public class Semantics {
         prog.display(0);
         System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = StaticTypeCheck.typing(prog.decpart);
+        TypeMap map = StaticTypeCheck.typing(prog.globals);
         map.display();
         StaticTypeCheck.V(prog);
         Program out = TypeTransformer.T(prog, map);
@@ -166,7 +218,7 @@ public class Semantics {
         out.display(0);
         Semantics semantics = new Semantics();
         System.out.println("Change State");
-        State state = semantics.M(out);
+        StateFrame state = semantics.M(out);
         System.out.println("Final State");
         state.display();
     }
