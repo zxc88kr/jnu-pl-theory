@@ -252,7 +252,6 @@ public class Parser {
 			if (isComma()) match(TokenType.Comma);
 		}
 		match(TokenType.RightParen);
-        match(TokenType.Semicolon);
 		return new Call(id, args);
 	}
 	
@@ -345,7 +344,12 @@ public class Parser {
         // Primary --> Identifier | Literal | ( Expression ) | Type ( Expression )
         Expression e = null;
         if (isIdentifier()) {
-            e = new Variable(match(TokenType.Identifier));
+            Variable v = new Variable(match(TokenType.Identifier));
+            if (token.type().equals(TokenType.LeftParen)) {
+                e = callStatement(v.toString());
+            } else {
+                e = v;
+            }
         } else if (isLiteral()) {
             e = literal();
         } else if (isLeftParen()) {
@@ -474,7 +478,7 @@ public class Parser {
 
     private boolean isStatement() {
         return isSemicolon() || isLeftBrace() ||
-               isIf() || isWhile() || isIdentifier();
+               isIf() || isWhile() || isIdentifier() || isReturn();
     }
 
     private boolean isSemicolon() {

@@ -120,17 +120,18 @@ class ProtoType extends Type {
     
     public void display(int k) { }
  }
- 
 
-abstract class Statement {
+
+interface Statement {
     // Statement = Skip | Block | Assignment | Conditional | Loop | Call | Return
+    void display(int k);
+}
+
+class Skip implements Statement {
     public void display(int k) { }
 }
 
-class Skip extends Statement {
-}
-
-class Block extends Statement {
+class Block implements Statement {
     // Block = Statement*
     public ArrayList<Statement> members = new ArrayList<Statement>();
 
@@ -140,7 +141,7 @@ class Block extends Statement {
     }
 }
 
-class Assignment extends Statement {
+class Assignment implements Statement {
     // Assignment = Variable target; Expression source
     Variable target;
     Expression source;
@@ -159,7 +160,7 @@ class Assignment extends Statement {
     }
 }
 
-class Conditional extends Statement {
+class Conditional implements Statement {
     // Conditional = Expression test; Statement thenbranch, elsebranch
     Expression test;
     Statement thenbranch, elsebranch;
@@ -182,7 +183,7 @@ class Conditional extends Statement {
     }
 }
 
-class Loop extends Statement {
+class Loop implements Statement {
     // Loop = Expression test; Statement body
     Expression test;
     Statement body;
@@ -200,7 +201,7 @@ class Loop extends Statement {
     }
 }
 
-class Call extends Statement {
+class Call implements Statement, Expression {
     // Call = String name; Expressions args
     String name;
     Expressions args;
@@ -218,7 +219,7 @@ class Call extends Statement {
     }
 }
 
-class Return extends Statement {
+class Return implements Statement {
     // Return = Variable target; Expression result
     Variable target;
     Expression result;
@@ -252,12 +253,12 @@ class Expressions extends ArrayList<Expression> {
     }
 }
 
-abstract class Expression {
+interface Expression {
     // Expression = Variable | Value | Binary | Unary | Call
-    public void display(int k) { }
+    public void display(int k);
 }
 
-class Variable extends Expression {
+class Variable implements Expression {
     // Variable = String id
     private String id;
 
@@ -280,7 +281,7 @@ class Variable extends Expression {
     }
 }
 
-abstract class Value extends Expression {
+abstract class Value implements Expression {
     // Value = IntValue | BoolValue | CharValue | FloatValue | VoidValue | UndefinedValue | UnusedValue
     protected Type type;
     protected boolean undef = true;
@@ -479,7 +480,7 @@ class UnusedValue extends Value {
     }
 }
 
-class Binary extends Expression {
+class Binary implements Expression {
     // Binary = Operator op; Expression term1, term2
     Operator op;
     Expression term1, term2;
@@ -499,7 +500,7 @@ class Binary extends Expression {
     }
 }
 
-class Unary extends Expression {
+class Unary implements Expression {
     // Unary = Operator op; Expression term
     Operator op;
     Expression term;
@@ -515,24 +516,6 @@ class Unary extends Expression {
         System.out.print("Unary: ");
         op.display(++k);
         term.display(k);
-    }
-}
-
-class CallExpression extends Expression {
-    // Call = String name; Expressions args
-    String name;
-    Expressions args;
-
-    CallExpression(String n, Expressions a) {
-        name = n; args = a;
-    }
-
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Call: " + name);
-        args.display(++k);
     }
 }
 

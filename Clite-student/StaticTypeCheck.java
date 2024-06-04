@@ -122,8 +122,8 @@ public class StaticTypeCheck {
             if (u.op.floatOp()) return (Type.FLOAT);
             if (u.op.charOp()) return (Type.CHAR);
         }
-        if (e instanceof CallExpression) {
-            CallExpression c = (CallExpression)e;
+        if (e instanceof Call) {
+            Call c = (Call)e;
             check(tm.containsKey(c.name), "undefined call: " + c.name);
             return tm.get(c.name);
         }
@@ -168,8 +168,8 @@ public class StaticTypeCheck {
             else throw new IllegalArgumentException("should never reach here");
             return;
         }
-        if (e instanceof CallExpression) {
-            CallExpression c = (CallExpression)e;
+        if (e instanceof Call) {
+            Call c = (Call)e;
             check(tm.containsKey(c.name), "undefined call: " + c.name);
             ProtoType p = (ProtoType)tm.get(c.name);
             checkProtoType(p, tm, typeOf(e, tm), c.args);
