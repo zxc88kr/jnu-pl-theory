@@ -13,7 +13,7 @@ class Program {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        globals.display(++k);
+        globals.display(k);
         functions.display(k);
     }
 }
