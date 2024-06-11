@@ -13,7 +13,9 @@ class Program {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        globals.display(k);
+        System.out.println("Globals: ");
+        globals.display(++k);
+        System.out.println("Functions: ");
         functions.display(k);
     }
 }
@@ -24,11 +26,7 @@ class Declarations extends ArrayList<Declaration> {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        System.out.println("Declarations: ");
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("\t{");
+        System.out.print("{");
         for (int i = 0; i < size(); i++)
             get(i).display(k);
         System.out.println("}");
@@ -60,17 +58,8 @@ class Functions extends ArrayList<Function> {
 	}
     
     public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Functions: ");
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("\t{");
         for (int i = 0; i < size(); i++)
             get(i).display(k);
-        System.out.println("}");
     }
 }
 
@@ -89,9 +78,18 @@ class Function {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
-        System.out.println("Declarations: ");
-        params.display(++k);
-        locals.display(k);
+        System.out.println("Function: <" + id + ", " + type + ">");
+        for (int w = 0; w < k + 1; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Params: ");
+        params.display(k + 2);
+        for (int w = 0; w < k + 1; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Locals: ");
+        locals.display(k + 2);
+        body.display(k + 1);
 	}
 }
 
@@ -128,16 +126,23 @@ interface Statement {
 }
 
 class Skip implements Statement {
-    public void display(int k) { }
+    public void display(int k) {
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Skip: ");
+    }
 }
 
-class Block implements Statement {
+class Block extends ArrayList<Statement> implements Statement {
     // Block = Statement*
-    public ArrayList<Statement> members = new ArrayList<Statement>();
-
     public void display(int k) {
-        for (int i = 0; i < members.size(); i++)
-            members.get(i).display(k);
+        for (int w = 0; w < k; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Block: ");
+        for (int i = 0; i < size(); i++)
+            get(i).display(k + 1);
     }
 }
 
@@ -155,8 +160,11 @@ class Assignment implements Statement {
             System.out.print("\t");
         }
         System.out.println("Assignement: ");
-        target.display(++k);
-        source.display(k);
+        for (int w = 0; w < k + 1; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Variable " + target.toString());
+        source.display(++k);
     }
 }
 
@@ -177,9 +185,12 @@ class Conditional implements Statement {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
+        System.out.println("Conditional: ");
         test.display(++k);
         thenbranch.display(k);
-        elsebranch.display(k);
+        if (!(elsebranch instanceof Skip)) {
+            elsebranch.display(k);
+        }
     }
 }
 
@@ -196,6 +207,7 @@ class Loop implements Statement {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
+        System.out.println("Loop: ");
         test.display(++k);
         body.display(k);
     }
@@ -215,7 +227,13 @@ class Call implements Statement, Expression {
             System.out.print("\t");
         }
         System.out.println("Call: " + name);
-        args.display(++k);
+        for (int w = 0; w < k + 1; w++) {
+            System.out.print("\t");
+        }
+        System.out.println("Args: ");
+        for (Expression e : args) {
+            e.display(k + 2);
+        }
     }
 }
 
@@ -232,25 +250,14 @@ class Return implements Statement {
         for (int w = 0; w < k; w++) {
             System.out.print("\t");
         }
+        System.out.println("Return: ");
         target.display(++k);
         result.display(k);
     }
 }
 
 class Expressions extends ArrayList<Expression> {
-    public void display(int k) {
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.println("Expressions: ");
-        for (int w = 0; w < k; w++) {
-            System.out.print("\t");
-        }
-        System.out.print("\t{");
-        for (int i = 0; i < size(); i++)
-            get(i).display(k);
-        System.out.println("}");
-    }
+    public void display(int k) { }
 }
 
 interface Expression {

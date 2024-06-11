@@ -183,7 +183,7 @@ public class Parser {
         match(TokenType.LeftBrace);
         while (isStatement()) {
             s = statement();
-            b.members.add(s);
+            b.add(s);
         }
         match(TokenType.RightBrace);
         return b;
@@ -195,7 +195,7 @@ public class Parser {
         Block b = new Block();
         while (isStatement()) {
             s = statement();
-            b.members.add(s);
+            b.add(s);
         }
         return b;
     }

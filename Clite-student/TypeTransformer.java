@@ -125,8 +125,8 @@ public class TypeTransformer {
         if (s instanceof Block) {
             Block b = (Block)s;
             Block out = new Block();
-            for (Statement stmt: b.members)
-                out.members.add(T(stmt, tm));
+            for (Statement stmt : b)
+                out.add(T(stmt, tm));
             return out;
         }
         throw new IllegalArgumentException("should never reach here");

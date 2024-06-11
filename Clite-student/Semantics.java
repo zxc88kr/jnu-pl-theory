@@ -39,7 +39,7 @@ public class Semantics {
 		System.out.print("Call: " + c.name);
 		state.display();
 		
-		Iterator<Statement> memIt = f.body.members.iterator();
+		Iterator<Statement> memIt = f.body.iterator();
 		while (memIt.hasNext()) {
 			Statement stmt = memIt.next();
 			if (state.get(new Variable(c.name)) != null && !state.get(new Variable(c.name)).isUndef()) {
@@ -81,7 +81,7 @@ public class Semantics {
     }
 
     StateFrame M(Block b, StateFrame state) {
-        for (Statement s : b.members)
+        for (Statement s : b)
             state = M(s, state);
         return state;
     }

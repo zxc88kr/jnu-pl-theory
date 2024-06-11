@@ -218,7 +218,7 @@ public class StaticTypeCheck {
         }
         if (s instanceof Block) {
             Block b = (Block)s;
-            for(Statement stmt: b.members)
+            for (Statement stmt : b)
                 V(stmt, tm);
             return;
         }
