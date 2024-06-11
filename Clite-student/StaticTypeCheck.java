@@ -104,7 +104,7 @@ public class StaticTypeCheck {
         if (e instanceof Variable) {
             Variable v = (Variable)e;
             check(tm.containsKey(v), "undefined variable: " + v);
-            return (Type)tm.get(v);
+            return tm.get(v);
         }
         if (e instanceof Binary) {
             Binary b = (Binary)e;
@@ -225,7 +225,7 @@ public class StaticTypeCheck {
         if (s instanceof Call) {
             Call c = (Call)s;
             check(tm.containsKey(c.name), "undefined call: " + c.name);
-            ProtoType p = (ProtoType)tm.get(c.name);
+            ProtoType p = (ProtoType)tm.get(new Variable(c.name));
             checkProtoType(p, tm, Type.VOID, c.args);
             return;
         }

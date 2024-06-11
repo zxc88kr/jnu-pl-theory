@@ -92,7 +92,7 @@ public class TypeTransformer {
             Assignment a = (Assignment)s;
             Variable target = a.target;
             Expression src = T(a.source, tm);
-            Type ttype = (Type)tm.get(a.target);
+            Type ttype = tm.get(a.target);
             Type srctype = StaticTypeCheck.typeOf(a.source, tm);
             if (ttype == Type.FLOAT) {
                 if (srctype == Type.INT) {
@@ -128,6 +128,18 @@ public class TypeTransformer {
             for (Statement stmt : b)
                 out.add(T(stmt, tm));
             return out;
+        }
+        if (s instanceof Call) {
+            Call c = (Call)s;
+            Expressions exp = new Expressions();
+            for (Expression e : c.args)
+                exp.add(T(e, tm));
+            return new Call(c.name, exp);
+        }
+        if (s instanceof Return) {
+            Return r = (Return)s;
+            Expression result = T(r.result, tm);
+            return new Return(r.target, result);
         }
         throw new IllegalArgumentException("should never reach here");
     }
