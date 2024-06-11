@@ -25,11 +25,11 @@ public class StaticTypeCheck {
     }
 
     public static void checkProtoType(ProtoType p, TypeMap tm, Type t, Expressions es) {
-        check(p.equals(t), "calls can only be to void functions");
         check(es.size() == p.params.size(), "match numbers of arguments and params");
+        check(p.toString().equals(t.toString()), "calls can only be to void functions");
         for (int i = 0; i < es.size(); i++) {
-           Expression e1 = (Expression)es.get(i);
-           Expression e2 = (Expression)((Declaration)p.params.get(i)).var;
+           Expression e1 = es.get(i);
+           Expression e2 = p.params.get(i).var;
            check(typeOf(e1, tm).equals(typeOf(e2, typing(p.params))), "argument type does not match parameter");
         }
     }
@@ -77,7 +77,7 @@ public class StaticTypeCheck {
         V(p.globals, p.functions);
         boolean foundmain = false;
         TypeMap tmg = typing(p.globals, p.functions);
-        System.out.print("Globals = ");
+        System.out.println("Globals:");
         p.globals.display(1);
         for (Function f : p.functions) {
             if (f.id.equals("main")) {
@@ -87,7 +87,7 @@ public class StaticTypeCheck {
             V(f.params, f.locals);
             TypeMap tmf = typing(f.params).onion(typing(f.locals));
             tmf = tmg.onion(tmf);
-            System.out.print("\nFunction " + f.id + " = ");
+            System.out.print("Function " + f.id + ": \n");
             tmf.display();
             V(f.body, tmf);
         }
@@ -124,8 +124,8 @@ public class StaticTypeCheck {
         }
         if (e instanceof Call) {
             Call c = (Call)e;
-            check(tm.containsKey(c.name), "undefined call: " + c.name);
-            return tm.get(c.name);
+            check(tm.containsKey(new Variable(c.name)), "undefined call: " + c.name);
+            return tm.get(new Variable(c.name));
         }
         throw new IllegalArgumentException("should never reach here");
     } 
@@ -170,8 +170,8 @@ public class StaticTypeCheck {
         }
         if (e instanceof Call) {
             Call c = (Call)e;
-            check(tm.containsKey(c.name), "undefined call: " + c.name);
-            ProtoType p = (ProtoType)tm.get(c.name);
+            check(tm.containsKey(new Variable(c.name)), "undefined call: " + c.name);
+            ProtoType p = (ProtoType)tm.get(new Variable(c.name));
             checkProtoType(p, tm, typeOf(e, tm), c.args);
             return;
         }
@@ -185,13 +185,13 @@ public class StaticTypeCheck {
             Assignment a = (Assignment)s;
             check(tm.containsKey(a.target), "undefined target in assignment: " + a.target);
             V(a.source, tm);
-            Type ttype = (Type)tm.get(a.target);
+            Type ttype = tm.get(a.target);
             Type srctype = typeOf(a.source, tm);
-            if (ttype != srctype) {
+            if (ttype.toString() != srctype.toString()) {
                 if (ttype == Type.FLOAT)
-                    check(srctype == Type.INT, "mixed mode assignment to " + a.target);
+                    check(srctype.toString() == Type.INT.toString(), "mixed mode assignment to " + a.target);
                 else if (ttype == Type.INT)
-                    check(srctype == Type.CHAR, "mixed mode assignment to " + a.target);
+                    check(srctype.toString() == Type.CHAR.toString(), "mixed mode assignment to " + a.target);
                 else check(false, "mixed mode assignment to " + a.target);
             }
             return;
@@ -224,7 +224,7 @@ public class StaticTypeCheck {
         }
         if (s instanceof Call) {
             Call c = (Call)s;
-            check(tm.containsKey(c.name), "undefined call: " + c.name); 
+            check(tm.containsKey(c.name), "undefined call: " + c.name);
             ProtoType p = (ProtoType)tm.get(c.name);
             checkProtoType(p, tm, Type.VOID, c.args);
             return;
@@ -233,7 +233,7 @@ public class StaticTypeCheck {
             Return r = (Return)s;
             check(tm.containsKey(r.target), "undefined return: " + r.target);
             V(r.result, tm);
-            check(((Type)tm.get(r.target)).equals(typeOf(r.result, tm)), "incorrect return type");
+            check(tm.get(r.target).toString().equals(typeOf(r.result, tm).toString()), "incorrect return type");
             return;
         }
         throw new IllegalArgumentException("should never reach here");
@@ -243,9 +243,8 @@ public class StaticTypeCheck {
         Parser parser = new Parser(new Lexer(args[0]));
         Program prog = parser.program();
         prog.display(0);
-        System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = typing(prog.globals);
+        TypeMap map = typing(prog.globals, prog.functions);
         map.display();
         V(prog);
     }

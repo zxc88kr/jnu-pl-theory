@@ -208,9 +208,8 @@ public class Semantics {
         Parser parser = new Parser(new Lexer(args[0]));
         Program prog = parser.program();
         prog.display(0);
-        System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
-        TypeMap map = StaticTypeCheck.typing(prog.globals);
+        TypeMap map = StaticTypeCheck.typing(prog.globals, prog.functions);
         map.display();
         StaticTypeCheck.V(prog);
         Program out = TypeTransformer.T(prog, map);

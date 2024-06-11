@@ -136,7 +136,6 @@ public class TypeTransformer {
         Parser parser = new Parser(new Lexer(args[0]));
         Program prog = parser.program();
         prog.display(0);
-        System.out.println("\nBegin type checking...");
         System.out.println("Type map:");
         TypeMap map = StaticTypeCheck.typing(prog.globals);
         map.display();

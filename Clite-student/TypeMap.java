@@ -7,23 +7,17 @@ public class TypeMap extends HashMap<Variable, Type> {
         res.putAll(tm);
         return res;
     }
-    
+
     public void display() {
-        System.out.println();
-        System.out.print("{ ");
-        String sep = "";
         for (Variable key : keySet()) {
-            System.out.print(sep + "<" + key + ", " );
+            System.out.print("\t" + key + ", " );
             Type t = this.get(key);
             if (t instanceof ProtoType) {
                 System.out.print(((ProtoType)t).id + ", ");
-                ((ProtoType)t).params.display(1);
-                System.out.print(">");
+                ((ProtoType)t).params.display(0);
             } else {
-                System.out.print(get(key).id + ">"); 
+                System.out.print(get(key).id + ",\t");
             }
-            sep = ", \n";
         }
-        System.out.println(" }");
     }
 }
